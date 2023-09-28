@@ -1,5 +1,6 @@
 using Core.Entities;
 using Core.Interfaces;
+using Core.Specification;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -8,9 +9,9 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class ProductsController : ControllerBase
     {
-        private readonly IProductRepository _repo;
+        private readonly IGenericRepository<Product> _repo;
 
-        public ProductsController(IProductRepository repo)
+        public ProductsController(IGenericRepository<Product> repo)
         {
             _repo = repo;
         }
@@ -18,26 +19,28 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Product>>> GetProduct()
         {
-            var product = await _repo.GetProductAsync();
+            var spec = new ProductWidthTypeAndBrandSpecification();
+            var product = await _repo.ListAsync(spec);
             return Ok(product);
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProductById(int id)
         {
-            return await _repo.GetProductByIdAsync(id);
+            return await _repo.GetByIdAsync(id);
         }
-        [HttpGet("brand")]
-        public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductBrand()
-        {
-            var brands = await _repo.GetProductBrandAsync();
-            return Ok(brands);
-        }
-        
-        [HttpGet("type")]
-        public async Task<ActionResult<IReadOnlyList<ProductType>>> GetProductType()
-        {
-            var types = await _repo.GetProductTypeAsync();
-            return Ok(types);
-        }
+        /*[HttpGet("brand")]
+
+       public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductBrand()
+       {
+           var brands = await _repo.GetProductBrandAsync();
+           return Ok(brands);
+       }
+
+       [HttpGet("type")]
+       public async Task<ActionResult<IReadOnlyList<ProductType>>> GetProductType()
+       {
+           var types = await _repo.GetProductTypeAsync();
+           return Ok(types);
+       }*/
     }
 }
